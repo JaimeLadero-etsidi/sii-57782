@@ -42,3 +42,6 @@ Asignatura impartida por el **Departamento de Ingeniería Eléctrica, Electróni
 Este repositorio tiene finalidad exclusivamente docente.
 
 Si detectas algún error o tienes alguna sugerencia de mejora, puedes comunicarlo al profesorado de la asignatura.
+
+## Práctica 1: Juego del Tenis
+-Implementando el movimiento de la esfera y las raquetas
