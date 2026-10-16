@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -17,11 +19,13 @@
 CMundo::CMundo()
 {
 	Init();
+	puntos1=0;
+	puntos2=0;
 }
 
 CMundo::~CMundo()
 {
-
+	close(fd);
 }
 
 void CMundo::InitGL()
@@ -114,7 +118,7 @@ void CMundo::OnDraw()
 }
 
 void CMundo::OnTimer(int value)
-{	
+{
 	jugador1.Mueve(0.025f);
 	jugador2.Mueve(0.025f);
 	esfera.Mueve(0.025f);
@@ -135,6 +139,14 @@ void CMundo::OnTimer(int value)
 		esfera.velocidad.x=2+2*rand()/(float)RAND_MAX;
 		esfera.velocidad.y=2+2*rand()/(float)RAND_MAX;
 		puntos2++;
+		char mensaje[100];
+		int n = sprintf(mensaje, "Jugador 2 marca 2 punto, lleva un total de %d puntos.\n", puntos2);
+		write(fd, mensaje, n);
+		if (puntos2>=3) {
+			write(fd,"¡Jugador 2 gana la partida!\n",28);
+			close(fd);
+			exit(0);
+		}
 	}
 
 	if(fondo_dcho.Rebota(esfera))
@@ -144,6 +156,15 @@ void CMundo::OnTimer(int value)
 		esfera.velocidad.x=-2-2*rand()/(float)RAND_MAX;
 		esfera.velocidad.y=-2-2*rand()/(float)RAND_MAX;
 		puntos1++;
+		char mensaje[100];
+		int n = sprintf(mensaje, "Jugador 1 marca 1 punto, lleva un total de %d puntos.\n", puntos1);
+                write(fd, mensaje, n);
+		if (puntos1>=3) {
+                        write(fd,"¡Jugador 1 gana la partida!\n",28);
+                        close(fd);
+                        exit(0);
+                }
+
 	}
 
 }
@@ -192,4 +213,8 @@ void CMundo::Init()
 	jugador2.g=0;
 	jugador2.x1=6;jugador2.y1=-1;
 	jugador2.x2=6;jugador2.y2=1;
+	fd = open("tuberia", O_WRONLY);
+    	if (fd < 0) {
+        	perror("No se pudo abrir la tuberia para escritura");
+    	}
 }

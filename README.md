@@ -45,3 +45,7 @@ Si detectas algún error o tienes alguna sugerencia de mejora, puedes comunicarl
 
 ## Práctica 1: Juego del Tenis
 -Implementando el movimiento de la esfera y las raquetas
+
+## Práctica 2: Tuberias FIFO y Logger
+Descripción:
+En esta práctica he desarrollado Logger externo mediante una tubería FIFO. De forma que el juego envía los golpes mediante una tubería.
