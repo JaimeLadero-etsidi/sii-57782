@@ -11,6 +11,10 @@
 #include <math.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -35,7 +39,7 @@ void CMundo::InitGL()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
-	
+
 	glMatrixMode(GL_PROJECTION);
 	gluPerspective( 40.0, 800/600.0f, 0.1, 150);
 }
@@ -63,9 +67,9 @@ void print(char *mensaje, int x, int y, float r, float g, float b)
 	glColor3f(r,g,b);
 	glRasterPos3f(x, glutGet(GLUT_WINDOW_HEIGHT)-18-y, 0);
 	int len = strlen (mensaje );
-	for (int i = 0; i < len; i++) 
+	for (int i = 0; i < len; i++)
 		glutBitmapCharacter (GLUT_BITMAP_HELVETICA_18, mensaje[i] );
-		
+
 	glMatrixMode(GL_TEXTURE);
 	glPopMatrix();
 
@@ -74,21 +78,20 @@ void print(char *mensaje, int x, int y, float r, float g, float b)
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-
 	glEnable( GL_DEPTH_TEST );
 }
 void CMundo::OnDraw()
 {
-	//Borrado de la pantalla	
+	//Borrado de la pantalla
    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Para definir el punto de vista
-	glMatrixMode(GL_MODELVIEW);	
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
+
 	gluLookAt(0.0, 0, 17,  // posicion del ojo
-		0.0, 0.0, 0.0,      // hacia que punto mira  (0,0,0) 
-		0.0, 1.0, 0.0);      // definimos hacia arriba (eje Y)    
+		0.0, 0.0, 0.0,      // hacia que punto mira  (0,0,0)
+		0.0, 1.0, 0.0);      // definimos hacia arriba (eje Y)
 
 	/////////////////
 	///////////
@@ -154,8 +157,7 @@ void CMundo::OnTimer(int value)
 		esfera.centro.x=0;
 		esfera.centro.y=rand()/(float)RAND_MAX;
 		esfera.velocidad.x=-2-2*rand()/(float)RAND_MAX;
-		esfera.velocidad.y=-2-2*rand()/(float)RAND_MAX;
-		puntos1++;
+		esfera.velocidad.y=-2-2*rand()/(float)RAND_MAX;		puntos1++;
 		char mensaje[100];
 		int n = sprintf(mensaje, "Jugador 1 marca 1 punto, lleva un total de %d puntos.\n", puntos1);
                 write(fd, mensaje, n);
@@ -166,7 +168,29 @@ void CMundo::OnTimer(int value)
                 }
 
 	}
+	// Actualizamos la posición de la esfera y la raqueta compartida
+    	memCompartida->esfera = esfera;
+    	memCompartida->raqueta1 = jugador1;
 
+	switch (memCompartida->accion) {
+    		case 1:
+        		if(jugador1.y2 <10.0){
+				OnKeyboardDown('w', 0, 0);
+        		} else {
+				jugador1.velocidad.y= 0.0;
+			}
+			break;
+    		case -1:
+        		if (jugador1.y1 > -10.0) {
+                		OnKeyboardDown('s', 0, 0);
+            		} else {
+                		jugador1.velocidad.y = 0.0; // Frena si toca el suelo
+            		}
+            		break;
+    		case 0:
+			jugador1.velocidad.y=0;
+        	break;
+	}
 }
 
 void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
@@ -217,4 +241,17 @@ void CMundo::Init()
     	if (fd < 0) {
         	perror("No se pudo abrir la tuberia para escritura");
     	}
+	// Abro el fichero de memoria compartida
+	fd_shm = open("/tmp/tenis_memoria", O_CREAT | O_RDWR, 0666);
+	ftruncate(fd_shm, sizeof(DatosMemCompartida));
+	// Proyecto el fichero en memoria
+	memCompartida = (DatosMemCompartida *) mmap(NULL, sizeof(DatosMemCompartida), PROT_READ | PROT_WRITE, MAP_SHARED, fd_shm, 0);
+	close(fd_shm);
+	// Inicializo la acción a 0 (nada)
+
+	memCompartida->accion = 0;
 }
+
+
+
+

@@ -6,6 +6,7 @@
 #define AFX_MUNDO_H__9510340A_3D75_485F_93DC_302A43B8039A__INCLUDED_
 
 #include <vector>
+#include "DatosMemCompartida.h"
 #include "Plano.h"
 
 #if _MSC_VER > 1000
@@ -38,6 +39,8 @@ public:
 	int puntos2;
 private:
 	int fd;
+	DatosMemCompartida *memCompartida;
+	int fd_shm;
 };
 
 #endif // !defined(AFX_MUNDO_H__9510340A_3D75_485F_93DC_302A43B8039A__INCLUDED_)
