@@ -49,3 +49,8 @@ Si detectas algún error o tienes alguna sugerencia de mejora, puedes comunicarl
 ## Práctica 2: Tuberias FIFO y Logger
 Descripción:
 En esta práctica he desarrollado Logger externo mediante una tubería FIFO. De forma que el juego envía los golpes mediante una tubería.
+
+## Práctica 3: Bot
+Descripción:
+En esta práctica hemos tenido que desarrollar un bot autónomo, usando la memoria compartida( mmap). El bot se encarga de leer continuamente la posición de la pelota y envía ordenes de movimiento a la raqueta para poder defender de forma fluida. Cosa que no he terminado de conseguir, mi bot funciona pero no termina de defender del todo bien.
+
